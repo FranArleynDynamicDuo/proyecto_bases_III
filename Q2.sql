@@ -12,15 +12,14 @@ where
 group by
 	ps_partkey having
 	sum(ps_supplycost * ps_availqty) > ALL
-		(select
-		sum(ps_supplycost * ps_availqty)*0.5
+		(select sum(ps_supplycost * ps_availqty)*0.5
 		from
-		partsupp,
-		supplier,
-		nation
+			partsupp,
+			supplier,
+			nation
 		where
-		ps_suppkey = s_suppkey
-		and s_nationkey = n_nationkey
-		and n_regionkey = 4
-		and s_acctbal > 0
+			ps_suppkey = s_suppkey
+			and s_nationkey = n_nationkey
+			and n_regionkey = 4
+			and s_acctbal > 0
 		group by ps_partkey );

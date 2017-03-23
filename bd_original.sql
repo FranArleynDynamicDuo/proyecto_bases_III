@@ -6,14 +6,14 @@
 
 --  Limpiando la bd...
 
-drop table if exists Lineitem;
-drop table if exists Orders;
-drop table if exists Customer;
-drop table if exists Partsupp;
-drop table if exists Supplier;
-drop table if exists Nation;
-drop table if exists Region;
-drop table if exists Part;
+drop table if exists Lineitem cascade;
+drop table if exists Orders cascade;
+drop table if exists Customer cascade;
+drop table if exists Partsupp cascade;
+drop table if exists Supplier cascade;
+drop table if exists Nation cascade;
+drop table if exists Region cascade;
+drop table if exists Part cascade;
 
 -- Creando tablas...
 create table Part(
@@ -107,11 +107,11 @@ create table Lineitem(
 );
 
 -- Cargando los datos usando \copy ...
-\copy Part from '/var/lib/postgresql/datos/csv/part.csv' delimiter '|' CSV;
-\copy Region from '/var/lib/postgresql/datos/csv/region.csv' delimiter '|' CSV;
-\copy Nation from '/var/lib/postgresql/datos/csv/nation.csv' delimiter '|' CSV;
-\copy Supplier from '/var/lib/postgresql/datos/csv/supplier.csv' delimiter '|' CSV;
-\copy Partsupp from '/var/lib/postgresql/datos/csv/partsupp.csv' delimiter '|' CSV;
-\copy Customer from '/var/lib/postgresql/datos/csv/customer.csv' delimiter '|' CSV;
-\copy Orders from '/var/lib/postgresql/datos/csv/orders.csv' delimiter '|' CSV;
-\copy Lineitem from '/var/lib/postgresql/datos/csv/lineitem.csv' delimiter '|' CSV;
+\copy Part from '/etc/postgresql/9.4/main/part.csv' delimiter '|' CSV;
+\copy Region from '/etc/postgresql/9.4/main/region.csv' delimiter '|' CSV;
+\copy Nation from '/etc/postgresql/9.4/main/nation.csv' delimiter '|' CSV;
+\copy Supplier from '/etc/postgresql/9.4/main/supplier.csv' delimiter '|' CSV;
+\copy Partsupp from '/etc/postgresql/9.4/main/partsupp.csv' delimiter '|' CSV;
+\copy Customer from '/etc/postgresql/9.4/main/customer.csv' delimiter '|' CSV;
+\copy Orders from '/etc/postgresql/9.4/main/orders.csv' delimiter '|' CSV;
+\copy Lineitem from '/etc/postgresql/9.4/main/lineitem.csv' delimiter '|' CSV;

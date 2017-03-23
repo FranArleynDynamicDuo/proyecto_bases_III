@@ -303,6 +303,29 @@ CREATE INDEX index_shipdate
   USING btree
   (l_shipdate);
 
+/*
+  Utilizar índices en atributos utilizados en funciones de agregación, esta política 
+  es recomendada en la documentación oficial de postgresql ya que se suele recorrer 
+  la tabla entera para utilizar para encontrar los valores de atributo y aplicarles 
+  alguna operacion, y al darle un índice solo debe recorrer una tupla sencilla que 
+  contiene él valor y el apuntador
+*/
+
+CREATE INDEX index_l_quantity
+  ON lineitem
+  USING btree
+  (l_quantity);
+
+CREATE INDEX index_sum_q2
+  ON partsupp
+  USING btree
+  (ps_availqty, ps_supplycost);
+
+CREATE INDEX index_order_q3
+  ON orders
+  USING btree
+  (o_totalprice DESC, o_orderdate);
+
 /* 
   Utilizar un índice parcial con la condición s_acctbal > 0, ya que nos evitará 
   leer todas las entradas que no cumplen dicha condición y esto ahorraría una 
@@ -317,3 +340,10 @@ CREATE INDEX supplier_s_acctbal_idx
   USING btree
   (s_acctbal)
   WHERE s_acctbal > 0::numeric;
+
+/* 
+  Limpiamos la base de datos de la mayor cantidad de filas muertas y actualizamos
+  las estadisticas para que tomen en cuenta todas nuestras nuevas estructuras
+*/
+
+VACUUM FULL ANALYZE;
