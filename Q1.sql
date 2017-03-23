@@ -30,4 +30,5 @@ group by
 	l_year
 order by
 	supp_nation,
-	cust_natio
+	cust_nation,
+	l_year;

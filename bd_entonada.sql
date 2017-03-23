@@ -108,6 +108,21 @@ create table Lineitem(
   check (l_shipdate <= l_receiptdate)
 );
 
+/*
+  ya que al ser una relación intermedia entre orders y customer, es una tabla que 
+  ha acumulado ya un tamaño considerable cuyo propósito da a entender que va a 
+  seguir creciendo. Podemos utilizar la estadística histogram_bounds para ayudarnos 
+  a definir las condiciones del particion, particularmente si utilizamos esta 
+  estadistica sobre un atributo como él del c_custkey o o_orderkey para así separar 
+  en distintas tablas hijo los productos de distintas órdenes o clientes. Ya que 
+  en la estadística mencionada nos muestran los límites para dividir la tabla 
+  en conjuntos de tamaños equivalentes, reduciremos el tamaño del búsqueda 
+  notablemente y en general siempre será parecido. También se puede particionar 
+  tomando en cuenta las fechas, ya que es probable que las consultas se hagan 
+  continuamente sobre elementos recientes y podríamos ahorrarnos la lectura del 
+  elementos más antiguos.
+*/
+
 /* Creamos un conjunto de tablas hijo para lineitem organizadas de manera anual,
 este procedimiento puede hacerse con un trigger de manera automatica para que se
 creen tablas hijos de manera automatica pero para efectos de este proyecto las 
@@ -275,13 +290,30 @@ CREATE INDEX fki_lineitem_supplier
   USING btree
   (l_suppkey);
 
+/*
+  Utilizar un índice B-Tree en el atributo l_shipdate podría ayudar considerablemente 
+  a la consulta Q1, asumiendo que las fechas escritas en la consulta fuesen a ser 
+  sustituidas por cualquier otra. Si asumimos que las fechas de la consulta son 
+  fijas entonces nos convendría mejor un índice parcial con la condición “'1995-01-01' 
+  and date '1996-12-31'”
+*/
+
 CREATE INDEX index_shipdate
   ON lineitem
   USING btree
   (l_shipdate);
 
+/* 
+  Utilizar un índice parcial con la condición s_acctbal > 0, ya que nos evitará 
+  leer todas las entradas que no cumplen dicha condición y esto ahorraría una 
+  cantidad considerable del trabajo al manejador, también se podría utilizar 
+  una tabla particionada pero dado a que ninguna de las consultas busca balances 
+  menores a cero dep manera exclusiva, no estaríamos obteniendo ninguna mejoría 
+  frente al índice parcial.
+*/
+
 CREATE INDEX supplier_s_acctbal_idx
-  ON public.supplier
+  ON supplier
   USING btree
   (s_acctbal)
   WHERE s_acctbal > 0::numeric;
