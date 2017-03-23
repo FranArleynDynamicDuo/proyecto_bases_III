@@ -1,4 +1,4 @@
-select
+explain (format yaml) select
 	ps_partkey,
 	sum(ps_supplycost * ps_availqty) as value
 from

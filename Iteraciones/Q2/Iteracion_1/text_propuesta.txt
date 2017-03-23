@@ -1,0 +1,36 @@
+
+
+                                                             QUERY PLAN                                                             
+------------------------------------------------------------------------------------------------------------------------------------
+ GroupAggregate  (cost=74471.68..462745800.60 rows=159601 width=14)
+   Group Key: partsupp.ps_partkey
+   Filter: (SubPlan 1)
+   ->  Sort  (cost=38262.23..38661.23 rows=159601 width=14)
+         Sort Key: partsupp.ps_partkey
+         ->  Nested Loop  (cost=1.80..21739.43 rows=159601 width=14)
+               ->  Hash Join  (cost=1.38..371.88 rows=2000 width=4)
+                     Hash Cond: (supplier.s_nationkey = nation.n_nationkey)
+                     ->  Seq Scan on supplier  (cost=0.00..313.00 rows=10000 width=8)
+                     ->  Hash  (cost=1.31..1.31 rows=5 width=4)
+                           ->  Seq Scan on nation  (cost=0.00..1.31 rows=5 width=4)
+                                 Filter: (n_regionkey = 1)
+               ->  Index Scan using fki_partsupp_supplier on partsupp  (cost=0.42..9.88 rows=80 width=18)
+                     Index Cond: (ps_suppkey = supplier.s_suppkey)
+   SubPlan 1
+     ->  Materialize  (cost=36209.45..41643.81 rows=145365 width=14)
+           ->  GroupAggregate  (cost=36209.45..40206.99 rows=145365 width=14)
+                 Group Key: partsupp_1.ps_partkey
+                 ->  Sort  (cost=36209.45..36572.86 rows=145365 width=14)
+                       Sort Key: partsupp_1.ps_partkey
+                       ->  Nested Loop  (cost=1.80..21259.89 rows=145365 width=14)
+                             ->  Hash Join  (cost=1.38..391.75 rows=1822 width=4)
+                                   Hash Cond: (supplier_1.s_nationkey = nation_1.n_nationkey)
+                                   ->  Seq Scan on supplier supplier_1  (cost=0.00..338.00 rows=9108 width=8)
+                                         Filter: (s_acctbal > 0::numeric)
+                                   ->  Hash  (cost=1.31..1.31 rows=5 width=4)
+                                         ->  Seq Scan on nation nation_1  (cost=0.00..1.31 rows=5 width=4)
+                                               Filter: (n_regionkey = 4)
+                             ->  Index Scan using fki_partsupp_supplier on partsupp partsupp_1  (cost=0.42..10.65 rows=80 width=18)
+                                   Index Cond: (ps_suppkey = supplier_1.s_suppkey)
+(30 rows)
+

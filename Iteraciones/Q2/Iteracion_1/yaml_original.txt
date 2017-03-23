@@ -1,0 +1,167 @@
+
+
+                                        QUERY PLAN                                        
+------------------------------------------------------------------------------------------
+ - Plan:                                                                                 +
+     Node Type: "Aggregate"                                                              +
+     Strategy: "Sorted"                                                                  +
+     Startup Cost: 94306.06                                                              +
+     Total Cost: 464576249.58                                                            +
+     Plan Rows: 159904                                                                   +
+     Plan Width: 14                                                                      +
+     Group Key:                                                                          +
+       - "partsupp.ps_partkey"                                                           +
+     Filter: "(SubPlan 1)"                                                               +
+     Plans:                                                                              +
+       - Node Type: "Sort"                                                               +
+         Parent Relationship: "Outer"                                                    +
+         Startup Cost: 48001.59                                                          +
+         Total Cost: 48401.35                                                            +
+         Plan Rows: 159904                                                               +
+         Plan Width: 14                                                                  +
+         Sort Key:                                                                       +
+           - "partsupp.ps_partkey"                                                       +
+         Plans:                                                                          +
+           - Node Type: "Hash Join"                                                      +
+             Parent Relationship: "Outer"                                                +
+             Join Type: "Inner"                                                          +
+             Startup Cost: 396.88                                                        +
+             Total Cost: 31446.92                                                        +
+             Plan Rows: 159904                                                           +
+             Plan Width: 14                                                              +
+             Hash Cond: "(partsupp.ps_suppkey = supplier.s_suppkey)"                     +
+             Plans:                                                                      +
+               - Node Type: "Seq Scan"                                                   +
+                 Parent Relationship: "Outer"                                            +
+                 Relation Name: "partsupp"                                               +
+                 Alias: "partsupp"                                                       +
+                 Startup Cost: 0.00                                                      +
+                 Total Cost: 25451.00                                                    +
+                 Plan Rows: 800000                                                       +
+                 Plan Width: 18                                                          +
+               - Node Type: "Hash"                                                       +
+                 Parent Relationship: "Inner"                                            +
+                 Startup Cost: 371.88                                                    +
+                 Total Cost: 371.88                                                      +
+                 Plan Rows: 2000                                                         +
+                 Plan Width: 4                                                           +
+                 Plans:                                                                  +
+                   - Node Type: "Hash Join"                                              +
+                     Parent Relationship: "Outer"                                        +
+                     Join Type: "Inner"                                                  +
+                     Startup Cost: 1.38                                                  +
+                     Total Cost: 371.88                                                  +
+                     Plan Rows: 2000                                                     +
+                     Plan Width: 4                                                       +
+                     Hash Cond: "(supplier.s_nationkey = nation.n_nationkey)"            +
+                     Plans:                                                              +
+                       - Node Type: "Seq Scan"                                           +
+                         Parent Relationship: "Outer"                                    +
+                         Relation Name: "supplier"                                       +
+                         Alias: "supplier"                                               +
+                         Startup Cost: 0.00                                              +
+                         Total Cost: 313.00                                              +
+                         Plan Rows: 10000                                                +
+                         Plan Width: 8                                                   +
+                       - Node Type: "Hash"                                               +
+                         Parent Relationship: "Inner"                                    +
+                         Startup Cost: 1.31                                              +
+                         Total Cost: 1.31                                                +
+                         Plan Rows: 5                                                    +
+                         Plan Width: 4                                                   +
+                         Plans:                                                          +
+                           - Node Type: "Seq Scan"                                       +
+                             Parent Relationship: "Outer"                                +
+                             Relation Name: "nation"                                     +
+                             Alias: "nation"                                             +
+                             Startup Cost: 0.00                                          +
+                             Total Cost: 1.31                                            +
+                             Plan Rows: 5                                                +
+                             Plan Width: 4                                               +
+                             Filter: "(n_regionkey = 1)"                                 +
+       - Node Type: "Materialize"                                                        +
+         Parent Relationship: "SubPlan"                                                  +
+         Subplan Name: "SubPlan 1"                                                       +
+         Startup Cost: 46304.47                                                          +
+         Total Cost: 51749.80                                                            +
+         Plan Rows: 145641                                                               +
+         Plan Width: 14                                                                  +
+         Plans:                                                                          +
+           - Node Type: "Aggregate"                                                      +
+             Strategy: "Sorted"                                                          +
+             Parent Relationship: "Outer"                                                +
+             Startup Cost: 46304.47                                                      +
+             Total Cost: 50309.60                                                        +
+             Plan Rows: 145641                                                           +
+             Plan Width: 14                                                              +
+             Group Key:                                                                  +
+               - "partsupp_1.ps_partkey"                                                 +
+             Plans:                                                                      +
+               - Node Type: "Sort"                                                       +
+                 Parent Relationship: "Outer"                                            +
+                 Startup Cost: 46304.47                                                  +
+                 Total Cost: 46668.57                                                    +
+                 Plan Rows: 145641                                                       +
+                 Plan Width: 14                                                          +
+                 Sort Key:                                                               +
+                   - "partsupp_1.ps_partkey"                                             +
+                 Plans:                                                                  +
+                   - Node Type: "Hash Join"                                              +
+                     Parent Relationship: "Outer"                                        +
+                     Join Type: "Inner"                                                  +
+                     Startup Cost: 414.52                                                +
+                     Total Cost: 31322.26                                                +
+                     Plan Rows: 145641                                                   +
+                     Plan Width: 14                                                      +
+                     Hash Cond: "(partsupp_1.ps_suppkey = supplier_1.s_suppkey)"         +
+                     Plans:                                                              +
+                       - Node Type: "Seq Scan"                                           +
+                         Parent Relationship: "Outer"                                    +
+                         Relation Name: "partsupp"                                       +
+                         Alias: "partsupp_1"                                             +
+                         Startup Cost: 0.00                                              +
+                         Total Cost: 25451.00                                            +
+                         Plan Rows: 800000                                               +
+                         Plan Width: 18                                                  +
+                       - Node Type: "Hash"                                               +
+                         Parent Relationship: "Inner"                                    +
+                         Startup Cost: 391.75                                            +
+                         Total Cost: 391.75                                              +
+                         Plan Rows: 1822                                                 +
+                         Plan Width: 4                                                   +
+                         Plans:                                                          +
+                           - Node Type: "Hash Join"                                      +
+                             Parent Relationship: "Outer"                                +
+                             Join Type: "Inner"                                          +
+                             Startup Cost: 1.38                                          +
+                             Total Cost: 391.75                                          +
+                             Plan Rows: 1822                                             +
+                             Plan Width: 4                                               +
+                             Hash Cond: "(supplier_1.s_nationkey = nation_1.n_nationkey)"+
+                             Plans:                                                      +
+                               - Node Type: "Seq Scan"                                   +
+                                 Parent Relationship: "Outer"                            +
+                                 Relation Name: "supplier"                               +
+                                 Alias: "supplier_1"                                     +
+                                 Startup Cost: 0.00                                      +
+                                 Total Cost: 338.00                                      +
+                                 Plan Rows: 9108                                         +
+                                 Plan Width: 8                                           +
+                                 Filter: "(s_acctbal > 0::numeric)"                      +
+                               - Node Type: "Hash"                                       +
+                                 Parent Relationship: "Inner"                            +
+                                 Startup Cost: 1.31                                      +
+                                 Total Cost: 1.31                                        +
+                                 Plan Rows: 5                                            +
+                                 Plan Width: 4                                           +
+                                 Plans:                                                  +
+                                   - Node Type: "Seq Scan"                               +
+                                     Parent Relationship: "Outer"                        +
+                                     Relation Name: "nation"                             +
+                                     Alias: "nation_1"                                   +
+                                     Startup Cost: 0.00                                  +
+                                     Total Cost: 1.31                                    +
+                                     Plan Rows: 5                                        +
+                                     Plan Width: 4                                       +
+                                     Filter: "(n_regionkey = 4)"
+(1 row)

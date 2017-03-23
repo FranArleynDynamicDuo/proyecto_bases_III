@@ -1,0 +1,35 @@
+                                                     QUERY PLAN                                                     
+--------------------------------------------------------------------------------------------------------------------
+ GroupAggregate  (cost=94306.06..464576249.58 rows=159904 width=14)
+   Group Key: partsupp.ps_partkey
+   Filter: (SubPlan 1)
+   ->  Sort  (cost=48001.59..48401.35 rows=159904 width=14)
+         Sort Key: partsupp.ps_partkey
+         ->  Hash Join  (cost=396.88..31446.92 rows=159904 width=14)
+               Hash Cond: (partsupp.ps_suppkey = supplier.s_suppkey)
+               ->  Seq Scan on partsupp  (cost=0.00..25451.00 rows=800000 width=18)
+               ->  Hash  (cost=371.88..371.88 rows=2000 width=4)
+                     ->  Hash Join  (cost=1.38..371.88 rows=2000 width=4)
+                           Hash Cond: (supplier.s_nationkey = nation.n_nationkey)
+                           ->  Seq Scan on supplier  (cost=0.00..313.00 rows=10000 width=8)
+                           ->  Hash  (cost=1.31..1.31 rows=5 width=4)
+                                 ->  Seq Scan on nation  (cost=0.00..1.31 rows=5 width=4)
+                                       Filter: (n_regionkey = 1)
+   SubPlan 1
+     ->  Materialize  (cost=46304.47..51749.80 rows=145641 width=14)
+           ->  GroupAggregate  (cost=46304.47..50309.60 rows=145641 width=14)
+                 Group Key: partsupp_1.ps_partkey
+                 ->  Sort  (cost=46304.47..46668.57 rows=145641 width=14)
+                       Sort Key: partsupp_1.ps_partkey
+                       ->  Hash Join  (cost=414.52..31322.26 rows=145641 width=14)
+                             Hash Cond: (partsupp_1.ps_suppkey = supplier_1.s_suppkey)
+                             ->  Seq Scan on partsupp partsupp_1  (cost=0.00..25451.00 rows=800000 width=18)
+                             ->  Hash  (cost=391.75..391.75 rows=1822 width=4)
+                                   ->  Hash Join  (cost=1.38..391.75 rows=1822 width=4)
+                                         Hash Cond: (supplier_1.s_nationkey = nation_1.n_nationkey)
+                                         ->  Seq Scan on supplier supplier_1  (cost=0.00..338.00 rows=9108 width=8)
+                                               Filter: (s_acctbal > 0::numeric)
+                                         ->  Hash  (cost=1.31..1.31 rows=5 width=4)
+                                               ->  Seq Scan on nation nation_1  (cost=0.00..1.31 rows=5 width=4)
+                                                     Filter: (n_regionkey = 4)
+(32 rows)

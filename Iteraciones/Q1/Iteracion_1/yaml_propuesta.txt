@@ -1,0 +1,151 @@
+                                                                                 QUERY PLAN                                                                                  
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ - Plan:                                                                                                                                                                    +
+     Node Type: "Sort"                                                                                                                                                      +
+     Startup Cost: 82301.56                                                                                                                                                 +
+     Total Cost: 82309.22                                                                                                                                                   +
+     Plan Rows: 3064                                                                                                                                                        +
+     Plan Width: 32                                                                                                                                                         +
+     Sort Key:                                                                                                                                                              +
+       - "n1.n_name"                                                                                                                                                        +
+       - "n2.n_name"                                                                                                                                                        +
+       - "(date_part('year'::text, (lineitem.l_shipdate)::timestamp without time zone))"                                                                                    +
+     Plans:                                                                                                                                                                 +
+       - Node Type: "Aggregate"                                                                                                                                             +
+         Strategy: "Hashed"                                                                                                                                                 +
+         Parent Relationship: "Outer"                                                                                                                                       +
+         Startup Cost: 82070.51                                                                                                                                             +
+         Total Cost: 82124.13                                                                                                                                               +
+         Plan Rows: 3064                                                                                                                                                    +
+         Plan Width: 32                                                                                                                                                     +
+         Group Key:                                                                                                                                                         +
+           - "n1.n_name"                                                                                                                                                    +
+           - "n2.n_name"                                                                                                                                                    +
+           - "date_part('year'::text, (lineitem.l_shipdate)::timestamp without time zone)"                                                                                  +
+         Plans:                                                                                                                                                             +
+           - Node Type: "Hash Join"                                                                                                                                         +
+             Parent Relationship: "Outer"                                                                                                                                   +
+             Join Type: "Inner"                                                                                                                                             +
+             Startup Cost: 28466.46                                                                                                                                         +
+             Total Cost: 81979.19                                                                                                                                           +
+             Plan Rows: 6088                                                                                                                                                +
+             Plan Width: 32                                                                                                                                                 +
+             Hash Cond: "(lineitem.l_orderkey = orders.o_orderkey)"                                                                                                         +
+             Join Filter: "(((n1.n_name = 'UNITED STATES'::text) AND (n2.n_name = 'CHINA'::text)) OR ((n1.n_name = 'CHINA'::text) AND (n2.n_name = 'UNITED STATES'::text)))"+
+             Plans:                                                                                                                                                         +
+               - Node Type: "Nested Loop"                                                                                                                                   +
+                 Parent Relationship: "Outer"                                                                                                                               +
+                 Join Type: "Inner"                                                                                                                                         +
+                 Startup Cost: 0.72                                                                                                                                         +
+                 Total Cost: 50112.31                                                                                                                                       +
+                 Plan Rows: 146299                                                                                                                                          +
+                 Plan Width: 28                                                                                                                                             +
+                 Plans:                                                                                                                                                     +
+                   - Node Type: "Nested Loop"                                                                                                                               +
+                     Parent Relationship: "Outer"                                                                                                                           +
+                     Join Type: "Inner"                                                                                                                                     +
+                     Startup Cost: 0.29                                                                                                                                     +
+                     Total Cost: 787.72                                                                                                                                     +
+                     Plan Rows: 800                                                                                                                                         +
+                     Plan Width: 12                                                                                                                                         +
+                     Join Filter: "(supplier.s_nationkey = n1.n_nationkey)"                                                                                                 +
+                     Plans:                                                                                                                                                 +
+                       - Node Type: "Index Scan"                                                                                                                            +
+                         Parent Relationship: "Outer"                                                                                                                       +
+                         Scan Direction: "Forward"                                                                                                                          +
+                         Index Name: "supplier_pkey"                                                                                                                        +
+                         Relation Name: "supplier"                                                                                                                          +
+                         Alias: "supplier"                                                                                                                                  +
+                         Startup Cost: 0.29                                                                                                                                 +
+                         Total Cost: 486.34                                                                                                                                 +
+                         Plan Rows: 10000                                                                                                                                   +
+                         Plan Width: 8                                                                                                                                      +
+                       - Node Type: "Materialize"                                                                                                                           +
+                         Parent Relationship: "Inner"                                                                                                                       +
+                         Startup Cost: 0.00                                                                                                                                 +
+                         Total Cost: 1.39                                                                                                                                   +
+                         Plan Rows: 2                                                                                                                                       +
+                         Plan Width: 12                                                                                                                                     +
+                         Plans:                                                                                                                                             +
+                           - Node Type: "Seq Scan"                                                                                                                          +
+                             Parent Relationship: "Outer"                                                                                                                   +
+                             Relation Name: "nation"                                                                                                                        +
+                             Alias: "n1"                                                                                                                                    +
+                             Startup Cost: 0.00                                                                                                                             +
+                             Total Cost: 1.38                                                                                                                               +
+                             Plan Rows: 2                                                                                                                                   +
+                             Plan Width: 12                                                                                                                                 +
+                             Filter: "((n_name = 'UNITED STATES'::text) OR (n_name = 'CHINA'::text))"                                                                       +
+                   - Node Type: "Index Scan"                                                                                                                                +
+                     Parent Relationship: "Inner"                                                                                                                           +
+                     Scan Direction: "Forward"                                                                                                                              +
+                     Index Name: "fki_lineitem_supplier"                                                                                                                    +
+                     Relation Name: "lineitem"                                                                                                                              +
+                     Alias: "lineitem"                                                                                                                                      +
+                     Startup Cost: 0.43                                                                                                                                     +
+                     Total Cost: 59.83                                                                                                                                      +
+                     Plan Rows: 183                                                                                                                                         +
+                     Plan Width: 24                                                                                                                                         +
+                     Index Cond: "(l_suppkey = supplier.s_suppkey)"                                                                                                         +
+                     Filter: "((l_shipdate >= '1995-01-01'::date) AND (l_shipdate <= '1996-12-31'::date))"                                                                  +
+               - Node Type: "Hash"                                                                                                                                          +
+                 Parent Relationship: "Inner"                                                                                                                               +
+                 Startup Cost: 26379.74                                                                                                                                     +
+                 Total Cost: 26379.74                                                                                                                                       +
+                 Plan Rows: 120000                                                                                                                                          +
+                 Plan Width: 12                                                                                                                                             +
+                 Plans:                                                                                                                                                     +
+                   - Node Type: "Nested Loop"                                                                                                                               +
+                     Parent Relationship: "Outer"                                                                                                                           +
+                     Join Type: "Inner"                                                                                                                                     +
+                     Startup Cost: 1.83                                                                                                                                     +
+                     Total Cost: 26379.74                                                                                                                                   +
+                     Plan Rows: 120000                                                                                                                                      +
+                     Plan Width: 12                                                                                                                                         +
+                     Plans:                                                                                                                                                 +
+                       - Node Type: "Hash Join"                                                                                                                             +
+                         Parent Relationship: "Outer"                                                                                                                       +
+                         Join Type: "Inner"                                                                                                                                 +
+                         Startup Cost: 1.40                                                                                                                                 +
+                         Total Cost: 5749.90                                                                                                                                +
+                         Plan Rows: 12000                                                                                                                                   +
+                         Plan Width: 12                                                                                                                                     +
+                         Hash Cond: "(customer.c_nationkey = n2.n_nationkey)"                                                                                               +
+                         Plans:                                                                                                                                             +
+                           - Node Type: "Seq Scan"                                                                                                                          +
+                             Parent Relationship: "Outer"                                                                                                                   +
+                             Relation Name: "customer"                                                                                                                      +
+                             Alias: "customer"                                                                                                                              +
+                             Startup Cost: 0.00                                                                                                                             +
+                             Total Cost: 5066.00                                                                                                                            +
+                             Plan Rows: 150000                                                                                                                              +
+                             Plan Width: 8                                                                                                                                  +
+                           - Node Type: "Hash"                                                                                                                              +
+                             Parent Relationship: "Inner"                                                                                                                   +
+                             Startup Cost: 1.38                                                                                                                             +
+                             Total Cost: 1.38                                                                                                                               +
+                             Plan Rows: 2                                                                                                                                   +
+                             Plan Width: 12                                                                                                                                 +
+                             Plans:                                                                                                                                         +
+                               - Node Type: "Seq Scan"                                                                                                                      +
+                                 Parent Relationship: "Outer"                                                                                                               +
+                                 Relation Name: "nation"                                                                                                                    +
+                                 Alias: "n2"                                                                                                                                +
+                                 Startup Cost: 0.00                                                                                                                         +
+                                 Total Cost: 1.38                                                                                                                           +
+                                 Plan Rows: 2                                                                                                                               +
+                                 Plan Width: 12                                                                                                                             +
+                                 Filter: "((n_name = 'CHINA'::text) OR (n_name = 'UNITED STATES'::text))"                                                                   +
+                       - Node Type: "Index Scan"                                                                                                                            +
+                         Parent Relationship: "Inner"                                                                                                                       +
+                         Scan Direction: "Forward"                                                                                                                          +
+                         Index Name: "fki_orders_customer"                                                                                                                  +
+                         Relation Name: "orders"                                                                                                                            +
+                         Alias: "orders"                                                                                                                                    +
+                         Startup Cost: 0.43                                                                                                                                 +
+                         Total Cost: 1.55                                                                                                                                   +
+                         Plan Rows: 17                                                                                                                                      +
+                         Plan Width: 8                                                                                                                                      +
+                         Index Cond: "(o_custkey = customer.c_custkey)"
+(1 row)
+

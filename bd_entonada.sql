@@ -39,9 +39,10 @@ create table Region(
 create table Nation(
   n_nationkey serial  primary key,
   n_name      text    check (char_length(n_name) <= 25),
-  n_regionkey integer not null,
+  n_regionkey integer not null references Region(r_regionkey),
   n_comment   text    check (char_length(n_comment) <= 152)
 );
+
 
 create table Supplier(
   s_suppkey   serial primary key,
@@ -108,115 +109,7 @@ create table Lineitem(
   check (l_shipdate <= l_receiptdate)
 );
 
-/*
-  ya que al ser una relación intermedia entre orders y customer, es una tabla que 
-  ha acumulado ya un tamaño considerable cuyo propósito da a entender que va a 
-  seguir creciendo. Podemos utilizar la estadística histogram_bounds para ayudarnos 
-  a definir las condiciones del particion, particularmente si utilizamos esta 
-  estadistica sobre un atributo como él del c_custkey o o_orderkey para así separar 
-  en distintas tablas hijo los productos de distintas órdenes o clientes. Ya que 
-  en la estadística mencionada nos muestran los límites para dividir la tabla 
-  en conjuntos de tamaños equivalentes, reduciremos el tamaño del búsqueda 
-  notablemente y en general siempre será parecido. También se puede particionar 
-  tomando en cuenta las fechas, ya que es probable que las consultas se hagan 
-  continuamente sobre elementos recientes y podríamos ahorrarnos la lectura del 
-  elementos más antiguos.
-*/
 
-/* Creamos un conjunto de tablas hijo para lineitem organizadas de manera anual,
-este procedimiento puede hacerse con un trigger de manera automatica para que se
-creen tablas hijos de manera automatica pero para efectos de este proyecto las 
-haremos de manera manual y estatica */
-
-CREATE TABLE lineitem_y1992 (
-    CHECK ( l_shipdate >= DATE '1992-01-01' AND l_shipdate <= DATE '1992-12-31' )
-) INHERITS (Lineitem);
-
-CREATE TABLE lineitem_y1993 (
-    CHECK ( l_shipdate >= DATE '1993-01-01' AND l_shipdate <= DATE '1993-12-31' )
-) INHERITS (Lineitem);
-
-CREATE TABLE lineitem_y1994 (
-    CHECK ( l_shipdate >= DATE '1994-01-01' AND l_shipdate <= DATE '1994-12-31' )
-) INHERITS (Lineitem);
-
-CREATE TABLE lineitem_y1995 (
-    CHECK ( l_shipdate >= DATE '1995-01-01' AND l_shipdate <= DATE '1995-12-31' )
-) INHERITS (Lineitem);
-
-CREATE TABLE lineitem_y1996 (
-    CHECK ( l_shipdate >= DATE '1996-01-01' AND l_shipdate <= DATE '1996-12-31' )
-) INHERITS (Lineitem);
-
-CREATE TABLE lineitem_y1997 (
-    CHECK ( l_shipdate >= DATE '1997-01-01' AND l_shipdate <= DATE '1997-12-31' )
-) INHERITS (Lineitem);
-
-CREATE TABLE lineitem_y1998 (
-    CHECK ( l_shipdate >= DATE '1998-01-01' AND l_shipdate <= DATE '1998-12-31' )
-) INHERITS (Lineitem);
-
--- Cargando los datos usando \copy ...
-\copy Part from '/etc/postgresql/9.4/main/part.csv' delimiter '|' CSV;
-\copy Region from '/etc/postgresql/9.4/main/region.csv' delimiter '|' CSV;
-\copy Nation from '/etc/postgresql/9.4/main/nation.csv' delimiter '|' CSV;
-\copy Supplier from '/etc/postgresql/9.4/main/supplier.csv' delimiter '|' CSV;
-\copy Partsupp from '/etc/postgresql/9.4/main/partsupp.csv' delimiter '|' CSV;
-\copy Customer from '/etc/postgresql/9.4/main/customer.csv' delimiter '|' CSV;
-\copy Orders from '/etc/postgresql/9.4/main/orders.csv' delimiter '|' CSV;
-\copy Lineitem from '/etc/postgresql/9.4/main/lineitem.csv' delimiter '|' CSV;
-
-
-ALTER TABLE Nation
-  ADD CONSTRAINT fk_nation_region FOREIGN KEY (n_regionkey)
-      REFERENCES region (r_regionkey) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION;
-
-
-/* Ya que para cargar la data se usa el comando copy tenemos que trasladar manualmente los registros de la
-tabla lineitem a sus hijos, ya que el comando copy ignora cualquier otra configuracion puesta a la tabla 
-excepto los triggers */
-insert into lineitem_y1992 select * 
-from Lineitem 
-where (l_shipdate >= DATE '1992-01-01' AND l_shipdate <= DATE '1992-12-31');
-
-delete from ONLY lineitem where (l_shipdate >= DATE '1992-01-01' AND l_shipdate <= DATE '1992-12-31');
-
-insert into lineitem_y1993 select *
-from Lineitem 
-where (l_shipdate >= DATE '1993-01-01' AND l_shipdate <= DATE '1993-12-31');
-
-delete from ONLY lineitem where (l_shipdate >= DATE '1993-01-01' AND l_shipdate <= DATE '1993-12-31');
-
-insert into lineitem_y1994 select *
-from Lineitem 
-where (l_shipdate >= DATE '1994-01-01' AND l_shipdate <= DATE '1994-12-31');
-
-delete from ONLY lineitem where (l_shipdate >= DATE '1994-01-01' AND l_shipdate <= DATE '1994-12-31');
-
-insert into lineitem_y1995 select *
-from Lineitem 
-where (l_shipdate >= DATE '1995-01-01' AND l_shipdate <= DATE '1995-12-31');
-
-delete from ONLY lineitem where (l_shipdate >= DATE '1995-01-01' AND l_shipdate <= DATE '1995-12-31');
-
-insert into lineitem_y1996 select *
-from Lineitem 
-where (l_shipdate >= DATE '1996-01-01' AND l_shipdate <= DATE '1996-12-31');
-
-delete from ONLY lineitem where (l_shipdate >= DATE '1996-01-01' AND l_shipdate <= DATE '1996-12-31');
-
-insert into lineitem_y1997 select *
-from Lineitem 
-where (l_shipdate >= DATE '1997-01-01' AND l_shipdate <= DATE '1997-12-31');
-
-delete from ONLY lineitem where (l_shipdate >= DATE '1997-01-01' AND l_shipdate <= DATE '1997-12-31');
-
-insert into lineitem_y1998 select *
-from Lineitem 
-where (l_shipdate >= DATE '1998-01-01' AND l_shipdate <= DATE '1998-12-31');
-
-delete from ONLY lineitem where (l_shipdate >= DATE '1998-01-01' AND l_shipdate <= DATE '1998-12-31');
 
 
 /* Creamos los indices */
@@ -226,8 +119,9 @@ delete from ONLY lineitem where (l_shipdate >= DATE '1998-01-01' AND l_shipdate 
   distintas tablas, además que esto forma parte de los estándares de optimización del postgresql. 
   Analizando caso por caso podríamos incluso ordenar las tablas por los atributos con los que se 
   suele hacer JOIN para así él planificador pueda utilizar el algoritmo de Merge Sort JOIN qué 
-  tiene el menor tiempo de búsqueda.
-*/ 
+  tiene el menr tiempo de búsqueda.
+*/
+
 CREATE INDEX fki_nation_region
   ON nation
   USING btree
@@ -268,12 +162,6 @@ CREATE INDEX fki_lineitem_order
   ON lineitem
   USING btree
   (l_orderkey);
-
-CREATE INDEX fki_customer_nation
-  ON customer
-  USING btree
-  (c_nationkey);
-
 
 CREATE INDEX fki_lineitem_part
   ON lineitem
@@ -340,6 +228,68 @@ CREATE INDEX supplier_s_acctbal_idx
   USING btree
   (s_acctbal)
   WHERE s_acctbal > 0::numeric;
+
+/*
+  ya que al ser una relación intermedia entre orders y customer, es una tabla que 
+  ha acumulado ya un tamaño considerable cuyo propósito da a entender que va a 
+  seguir creciendo. Podemos utilizar la estadística histogram_bounds para ayudarnos 
+  a definir las condiciones del particion, particularmente si utilizamos esta 
+  estadistica sobre un atributo como él del c_custkey o o_orderkey para así separar 
+  en distintas tablas hijo los productos de distintas órdenes o clientes. Ya que 
+  en la estadística mencionada nos muestran los límites para dividir la tabla 
+  en conjuntos de tamaños equivalentes, reduciremos el tamaño del búsqueda 
+  notablemente y en general siempre será parecido. También se puede particionar 
+  tomando en cuenta las fechas, ya que es probable que las consultas se hagan 
+  continuamente sobre elementos recientes y podríamos ahorrarnos la lectura del 
+  elementos más antiguos.
+*/
+
+/* Creamos un conjunto de tablas hijo para lineitem organizadas de manera anual,
+este procedimiento puede hacerse con un trigger de manera automatica para que se
+creen tablas hijos de manera automatica pero para efectos de este proyecto las 
+haremos de manera manual y estatica */
+
+CREATE INDEX lineitem_y1992
+  ON lineitem
+  USING btree
+  (l_shipdate)
+  WHERE l_shipdate >= DATE '1992-01-01' AND l_shipdate <= DATE '1992-12-31';
+
+CREATE INDEX lineitem_y1993
+  ON lineitem
+  USING btree
+  (l_shipdate)
+  WHERE l_shipdate >= DATE '1993-01-01' AND l_shipdate <= DATE '1993-12-31';
+
+CREATE INDEX lineitem_y1994
+  ON lineitem
+  USING btree
+  (l_shipdate)
+  WHERE l_shipdate >= DATE '1994-01-01' AND l_shipdate <= DATE '1994-12-31';
+
+CREATE INDEX lineitem_y1995
+  ON lineitem
+  USING btree
+  (l_shipdate)
+  WHERE l_shipdate >= DATE '1995-01-01' AND l_shipdate <= DATE '1995-12-31';
+
+CREATE INDEX lineitem_y1996
+  ON lineitem
+  USING btree
+  (l_shipdate)
+  WHERE l_shipdate >= DATE '1996-01-01' AND l_shipdate <= DATE '1996-12-31';
+
+CREATE INDEX lineitem_y1997
+  ON lineitem
+  USING btree
+  (l_shipdate)
+  WHERE l_shipdate >= DATE '1997-01-01' AND l_shipdate <= DATE '1997-12-31';
+
+CREATE INDEX lineitem_y1998
+  ON lineitem
+  USING btree
+  (l_shipdate)
+  WHERE l_shipdate >= DATE '1998-01-01' AND l_shipdate <= DATE '1998-12-31';
 
 /* 
   Limpiamos la base de datos de la mayor cantidad de filas muertas y actualizamos
