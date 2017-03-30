@@ -1,0 +1,191 @@
+                                      QUERY PLAN                                      
+--------------------------------------------------------------------------------------
+ - Plan:                                                                             +
+     Node Type: "Aggregate"                                                          +
+     Strategy: "Sorted"                                                              +
+     Startup Cost: 80234.19                                                          +
+     Total Cost: 86211.47                                                            +
+     Plan Rows: 159394                                                               +
+     Plan Width: 14                                                                  +
+     Group Key:                                                                      +
+       - "partsupp.ps_partkey"                                                       +
+     Filter: "(sum((partsupp.ps_supplycost * (partsupp.ps_availqty)::numeric)) > $1)"+
+     Plans:                                                                          +
+       - Node Type: "Aggregate"                                                      +
+         Strategy: "Plain"                                                           +
+         Parent Relationship: "InitPlan"                                             +
+         Subplan Name: "InitPlan 1 (returns $1)"                                     +
+         Startup Cost: 41995.10                                                      +
+         Total Cost: 41995.11                                                        +
+         Plan Rows: 1                                                                +
+         Plan Width: 32                                                              +
+         Plans:                                                                      +
+           - Node Type: "Aggregate"                                                  +
+             Strategy: "Sorted"                                                      +
+             Parent Relationship: "Outer"                                            +
+             Startup Cost: 36188.06                                                  +
+             Total Cost: 40180.40                                                    +
+             Plan Rows: 145176                                                       +
+             Plan Width: 14                                                          +
+             Group Key:                                                              +
+               - "partsupp_1.ps_partkey"                                             +
+             Plans:                                                                  +
+               - Node Type: "Sort"                                                   +
+                 Parent Relationship: "Outer"                                        +
+                 Startup Cost: 36188.06                                              +
+                 Total Cost: 36551.00                                                +
+                 Plan Rows: 145176                                                   +
+                 Plan Width: 14                                                      +
+                 Sort Key:                                                           +
+                   - "partsupp_1.ps_partkey"                                         +
+                 Plans:                                                              +
+                   - Node Type: "Nested Loop"                                        +
+                     Parent Relationship: "Outer"                                    +
+                     Join Type: "Inner"                                              +
+                     Startup Cost: 1.80                                              +
+                     Total Cost: 21259.58                                            +
+                     Plan Rows: 145176                                               +
+                     Plan Width: 14                                                  +
+                     Plans:                                                          +
+                       - Node Type: "Hash Join"                                      +
+                         Parent Relationship: "Outer"                                +
+                         Join Type: "Inner"                                          +
+                         Startup Cost: 1.38                                          +
+                         Total Cost: 391.75                                          +
+                         Plan Rows: 1822                                             +
+                         Plan Width: 4                                               +
+                         Hash Cond: "(supplier_1.s_nationkey = nation_1.n_nationkey)"+
+                         Plans:                                                      +
+                           - Node Type: "Seq Scan"                                   +
+                             Parent Relationship: "Outer"                            +
+                             Relation Name: "supplier"                               +
+                             Alias: "supplier_1"                                     +
+                             Startup Cost: 0.00                                      +
+                             Total Cost: 338.00                                      +
+                             Plan Rows: 9108                                         +
+                             Plan Width: 8                                           +
+                             Filter: "(s_acctbal > 0::numeric)"                      +
+                           - Node Type: "Hash"                                       +
+                             Parent Relationship: "Inner"                            +
+                             Startup Cost: 1.31                                      +
+                             Total Cost: 1.31                                        +
+                             Plan Rows: 5                                            +
+                             Plan Width: 4                                           +
+                             Plans:                                                  +
+                               - Node Type: "Seq Scan"                               +
+                                 Parent Relationship: "Outer"                        +
+                                 Relation Name: "nation"                             +
+                                 Alias: "nation_1"                                   +
+                                 Startup Cost: 0.00                                  +
+                                 Total Cost: 1.31                                    +
+                                 Plan Rows: 5                                        +
+                                 Plan Width: 4                                       +
+                                 Filter: "(n_regionkey = 4)"                         +
+                       - Node Type: "Index Scan"                                     +
+                         Parent Relationship: "Inner"                                +
+                         Scan Direction: "Forward"                                   +
+                         Index Name: "fki_partsupp_supplier"                         +
+                         Relation Name: "partsupp"                                   +
+                         Alias: "partsupp_1"                                         +
+                         Startup Cost: 0.42                                          +
+                         Total Cost: 10.65                                           +
+                         Plan Rows: 80                                               +
+                         Plan Width: 18                                              +
+                         Index Cond: "(ps_suppkey = supplier_1.s_suppkey)"           +
+       - Node Type: "Sort"                                                           +
+         Parent Relationship: "Outer"                                                +
+         Startup Cost: 38239.08                                                      +
+         Total Cost: 38637.56                                                        +
+         Plan Rows: 159394                                                           +
+         Plan Width: 14                                                              +
+         Sort Key:                                                                   +
+           - "partsupp.ps_partkey"                                                   +
+         Plans:                                                                      +
+           - Node Type: "Nested Loop"                                                +
+             Parent Relationship: "Outer"                                            +
+             Join Type: "Inner"                                                      +
+             Startup Cost: 1.80                                                      +
+             Total Cost: 21739.15                                                    +
+             Plan Rows: 159394                                                       +
+             Plan Width: 14                                                          +
+             Plans:                                                                  +
+               - Node Type: "Hash Join"                                              +
+                 Parent Relationship: "Outer"                                        +
+                 Join Type: "Inner"                                                  +
+                 Startup Cost: 1.38                                                  +
+                 Total Cost: 371.88                                                  +
+                 Plan Rows: 2000                                                     +
+                 Plan Width: 4                                                       +
+                 Hash Cond: "(supplier.s_nationkey = nation.n_nationkey)"            +
+                 Plans:                                                              +
+                   - Node Type: "Seq Scan"                                           +
+                     Parent Relationship: "Outer"                                    +
+                     Relation Name: "supplier"                                       +
+                     Alias: "supplier"                                               +
+                     Startup Cost: 0.00                                              +
+                     Total Cost: 313.00                                              +
+                     Plan Rows: 10000                                                +
+                     Plan Width: 8                                                   +
+                   - Node Type: "Hash"                                               +
+                     Parent Relationship: "Inner"                                    +
+                     Startup Cost: 1.31                                              +
+                     Total Cost: 1.31                                                +
+                     Plan Rows: 5                                                    +
+                     Plan Width: 4                                                   +
+                     Plans:                                                          +
+                       - Node Type: "Seq Scan"                                       +
+                         Parent Relationship: "Outer"                                +
+                         Relation Name: "nation"                                     +
+                         Alias: "nation"                                             +
+                         Startup Cost: 0.00                                          +
+                         Total Cost: 1.31                                            +
+                         Plan Rows: 5                                                +
+                         Plan Width: 4                                               +
+                         Filter: "(n_regionkey = 1)"                                 +
+               - Node Type: "Index Scan"                                             +
+                 Parent Relationship: "Inner"                                        +
+                 Scan Direction: "Forward"                                           +
+                 Index Name: "fki_partsupp_supplier"                                 +
+                 Relation Name: "partsupp"                                           +
+                 Alias: "partsupp"                                                   +
+                 Startup Cost: 0.42                                                  +
+                 Total Cost: 9.88                                                    +
+                 Plan Rows: 80                                                       +
+                 Plan Width: 18                                                      +
+                 Index Cond: "(ps_suppkey = supplier.s_suppkey)"
+(1 row)
+
+                                                             QUERY PLAN                                                             
+------------------------------------------------------------------------------------------------------------------------------------
+ GroupAggregate  (cost=80234.19..86211.47 rows=159394 width=14)
+   Group Key: partsupp.ps_partkey
+   Filter: (sum((partsupp.ps_supplycost * (partsupp.ps_availqty)::numeric)) > $1)
+   InitPlan 1 (returns $1)
+     ->  Aggregate  (cost=41995.10..41995.11 rows=1 width=32)
+           ->  GroupAggregate  (cost=36188.06..40180.40 rows=145176 width=14)
+                 Group Key: partsupp_1.ps_partkey
+                 ->  Sort  (cost=36188.06..36551.00 rows=145176 width=14)
+                       Sort Key: partsupp_1.ps_partkey
+                       ->  Nested Loop  (cost=1.80..21259.58 rows=145176 width=14)
+                             ->  Hash Join  (cost=1.38..391.75 rows=1822 width=4)
+                                   Hash Cond: (supplier_1.s_nationkey = nation_1.n_nationkey)
+                                   ->  Seq Scan on supplier supplier_1  (cost=0.00..338.00 rows=9108 width=8)
+                                         Filter: (s_acctbal > 0::numeric)
+                                   ->  Hash  (cost=1.31..1.31 rows=5 width=4)
+                                         ->  Seq Scan on nation nation_1  (cost=0.00..1.31 rows=5 width=4)
+                                               Filter: (n_regionkey = 4)
+                             ->  Index Scan using fki_partsupp_supplier on partsupp partsupp_1  (cost=0.42..10.65 rows=80 width=18)
+                                   Index Cond: (ps_suppkey = supplier_1.s_suppkey)
+   ->  Sort  (cost=38239.08..38637.56 rows=159394 width=14)
+         Sort Key: partsupp.ps_partkey
+         ->  Nested Loop  (cost=1.80..21739.15 rows=159394 width=14)
+               ->  Hash Join  (cost=1.38..371.88 rows=2000 width=4)
+                     Hash Cond: (supplier.s_nationkey = nation.n_nationkey)
+                     ->  Seq Scan on supplier  (cost=0.00..313.00 rows=10000 width=8)
+                     ->  Hash  (cost=1.31..1.31 rows=5 width=4)
+                           ->  Seq Scan on nation  (cost=0.00..1.31 rows=5 width=4)
+                                 Filter: (n_regionkey = 1)
+               ->  Index Scan using fki_partsupp_supplier on partsupp  (cost=0.42..9.88 rows=80 width=18)
+                     Index Cond: (ps_suppkey = supplier.s_suppkey)
+(30 rows)
+
