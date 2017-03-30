@@ -1,6 +1,4 @@
-                                                                                 QUERY PLAN                                                                                  
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- Sort  (cost=82301.56..82309.22 rows=3064 width=32)
+Sort  (cost=82301.56..82309.22 rows=3064 width=32)
    Sort Key: n1.n_name, n2.n_name, (date_part('year'::text, (lineitem.l_shipdate)::timestamp without time zone))
    ->  HashAggregate  (cost=82070.51..82124.13 rows=3064 width=32)
          Group Key: n1.n_name, n2.n_name, date_part('year'::text, (lineitem.l_shipdate)::timestamp without time zone)

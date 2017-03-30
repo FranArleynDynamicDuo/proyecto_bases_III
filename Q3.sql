@@ -1,4 +1,4 @@
-select
+explain (format text) select
 	c_name,
 	c_custkey,
 	o_orderkey,
